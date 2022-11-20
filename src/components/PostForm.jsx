@@ -22,13 +22,13 @@ const PostForm = ({ create }) => {
 				value={post.title}
 				onChange={(e) => setPost({ ...post, title: e.target.value })}
 				type="text"
-				placeholder="Name your post"
+				placeholder="Write title your post"
 			/>
 			<MyInput
 				value={post.body}
 				onChange={(e) => setPost({ ...post, body: e.target.value })}
 				type="text"
-				placeholder="Description your post"
+				placeholder="Write description your post"
 			/>
 			{/* НеуправляемЫй компонент */}
 			{/* <MyInput ref={bodyInputRef} type="text" placeholder="Description your post" /> */}
