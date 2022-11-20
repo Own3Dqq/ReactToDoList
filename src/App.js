@@ -1,8 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import PostList from './components/PostList';
 import PostForm from './components/PostForm';
 import './style/App.css';
-import MySelect from './components/UI/select/MySelect';
+import PostFilter from './components/PostFilter';
 
 function App() {
 	const [posts, setPosts] = useState([
@@ -11,7 +11,22 @@ function App() {
 		{ id: 3, title: 'Swift', body: 'Can you get out on my land' },
 	]);
 
-	const [selectedSort, setSelectedSort] = useState('');
+  const [filter, setFilter] =useState({
+    sort: '',
+    query: '',
+  })
+
+	const sortedPosts = useMemo(() => {
+		if (filter.sort) {
+			return [...posts].sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]));
+		}
+
+		return posts;
+	}, [filter.sort, posts]);
+
+  const sortedAndSearchedPosts = useMemo(() => {
+    return sortedPosts.filter(post => post.title.toLowerCase().includes(filter.query))
+  }, [filter.query, sortedPosts])
 
 	const createPost = (newPost) => {
 		setPosts([...posts, newPost]);
@@ -21,36 +36,24 @@ function App() {
 		setPosts(posts.filter((p) => p.id !== post.id));
 	};
 
-	const sortPosts = (sort) => {
-		setSelectedSort(sort);
-		setPosts([...posts].sort((a, b) => a[sort].localeCompare(b[sort])));
-	};
 
 	return (
 		<div className="App">
 			<PostForm create={createPost} />
 			<hr style={{ margin: '15px 0' }} />
-
-			<MySelect
-				defaultValue="Sorting by:"
-				value={selectedSort}
-				onChange={sortPosts}
-				options={[
-					{
-						value: 'title',
-						name: 'Sort by name',
-					},
-					{
-						value: 'body',
-						name: 'Sort by description',
-					},
-				]}
-			/>
-
-			{posts.length !== 0 ? (
-				<PostList remove={removePost} posts={posts} title="List To Do" />
+			<PostFilter 
+        filter={filter}
+        setFilter={setFilter}
+      />
+			{sortedAndSearchedPosts.length !== 0 ? (
+				<PostList 
+          remove={removePost} 
+          posts={sortedAndSearchedPosts} 
+          title="List To Do" />
 			) : (
-				<h2 className="App__null">Post was not found</h2>
+				<h2 className="App__null">
+          Post was not found
+         </h2>
 			)}
 		</div>
 	);
