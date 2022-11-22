@@ -5,31 +5,16 @@ import './style/App.css';
 import PostFilter from './components/PostFilter';
 import MyModal from './components/UI/modal/MyModal';
 import MyButton from './components/UI/button/MyButton';
+import { usePosts } from './hooks/usePosts';
 
 function App() {
-	const [posts, setPosts] = useState([
-		{ id: 1, title: 'Javascript', body: 'War on my land' },
-		{ id: 2, title: 'C#', body: 'Shut fuck off!' },
-		{ id: 3, title: 'Swift', body: 'Can you get out on my land' },
-	]);
-
+	const [posts, setPosts] = useState([]);
 	const [filter, setFilter] = useState({
 		sort: '',
 		query: '',
 	});
 	const [modal, setModal] = useState(false);
-
-	const sortedPosts = useMemo(() => {
-		if (filter.sort) {
-			return [...posts].sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]));
-		}
-
-		return posts;
-	}, [filter.sort, posts]);
-
-	const sortedAndSearchedPosts = useMemo(() => {
-		return sortedPosts.filter((post) => post.title.toLowerCase().includes(filter.query));
-	}, [filter.query, sortedPosts]);
+	const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
 
 	const createPost = (newPost) => {
 		setPosts([...posts, newPost]);
@@ -42,8 +27,8 @@ function App() {
 
 	return (
 		<div className="App">
-			<MyButton onClick={() => setModal(true)}>Create users post</MyButton>
-			<MyModal  visible={modal} setVisible={setModal}>
+			<MyButton onClick={() => setModal(true)}>Create new post</MyButton>
+			<MyModal visible={modal} setVisible={setModal}>
 				<PostForm create={createPost} />
 			</MyModal>
 			<hr style={{ margin: '15px 0' }} />
